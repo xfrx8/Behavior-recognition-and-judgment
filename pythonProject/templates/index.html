@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        img {
+            border: 2px solid #000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            background-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Streaming</h1>
+    <img src="{{ url_for('video_feed') }}" width="1280" height="720" id="videoStream">
+    <div id="controls">
+        <button onclick="resetCycleNum()">Reset Cycle Number</button>
+        <button onclick="toggleFullScreen()">Toggle Fullscreen</button>
+        <button onclick="refreshStream()">Refresh Stream</button>
+    </div>
+    <script>
+        async function resetCycleNum() {
+            try {
+                const response = await fetch('/reset_cycle_num');
+                const result = await response.json();
+                alert(result.status);
+            } catch (error) {
+                console.error('Error resetting cycle number:', error);
+            }
+        }
+
+        function toggleFullScreen() {
+            const videoElement = document.getElementById('videoStream');
+            if (!document.fullscreenElement) {
+                videoElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function refreshStream() {
+            const videoElement = document.getElementById('videoStream');
+            videoElement.src = "{{ url_for('video_feed') }}?" + new Date().getTime();
+        }
